@@ -11,34 +11,13 @@
             color: #3e2723;
             text-align: center;
             padding: 20px;
-            animation: fadeInPage 1s ease-in-out;
-            transition: background-color 0.5s;
         }
-
-        @keyframes fadeInPage {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
         h1 {
             color: #d81b60;
-            margin-bottom: 20px;
-            animation: fadeInText 1s ease-in-out;
         }
-
-        @keyframes fadeInText {
-            0% { opacity: 0; transform: translateY(-20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
         #searchSection {
             margin-top: 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            animation: fadeIn 1.5s ease-in-out;
         }
-
         #searchInput {
             width: 300px;
             padding: 12px;
@@ -46,17 +25,8 @@
             border: 2px solid #d81b60;
             font-size: 16px;
             margin-bottom: 15px;
-            transition: border-color 0.3s, transform 0.3s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-
-        #searchInput:focus {
-            border-color: #c2185b;
-            outline: none;
-            transform: scale(1.05);
-        }
-
-        #result {
+        #results {
             text-align: left;
             display: inline-block;
             width: 320px;
@@ -65,106 +35,70 @@
             background-color: #ffffff;
             border: 1px solid #ccc;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             margin-bottom: 20px;
-            animation: slideIn 0.7s ease;
-            padding: 10px;
-            display: none; /* Initially hidden */
         }
-
-        .flower-item {
+        .result-item {
             padding: 10px;
             cursor: pointer;
             border-bottom: 1px solid #ddd;
-            transition: background-color 0.2s;
         }
-
-        .flower-item:hover {
-            background-color: #f8bbd0;
-        }
-
-        .flower-image {
-            width: 100%;
-            height: auto;
+        .result-item img {
+            width: 50px;
+            height: 50px;
             border-radius: 8px;
-        }
-
-        button {
-            background-color: #d81b60;
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 20px;
-            transition: background-color 0.3s, transform 0.3s;
-        }
-
-        button:hover {
-            background-color: #c2185b;
-            transform: scale(1.1);
+            margin-right: 10px;
         }
     </style>
 </head>
 <body>
-    <h1>What Is Your Favorite Flower?</h1>
+    <h1>What Are Your Favorite Flowers?</h1>
+
     <div id="searchSection">
+        <h2>Search for Your Favorite Flower</h2>
         <input type="text" id="searchInput" placeholder="Type a flower name..." oninput="searchFlowers()">
-        <div id="result"></div>
-        <button type="button" onclick="clearSearch()">Clear</button>
+        <div id="results"></div>
     </div>
 
     <script>
-        const flowers = {
-            "Rose": "https://images.unsplash.com/photo-1574845522559-12a8e6f58d9d",
-            "Tulip": "https://images.unsplash.com/photo-1582719502941-0aa5d20e634b",
-            "Sunflower": "https://images.unsplash.com/photo-1505150031097-0c3cb1d305c8",
-            "Daisy": "https://images.unsplash.com/photo-1555892625-f18d7ebc36ec",
-            "Lily": "https://images.unsplash.com/photo-1514369912085-cd64795b7494",
-            "Orchid": "https://images.unsplash.com/photo-1503042443070-3c7d0c0b4f15",
-            "Peony": "https://images.unsplash.com/photo-1590715862918-54d7d4cc8b69",
-            "Marigold": "https://images.unsplash.com/photo-1574169208483-5e8bc0be93e7",
-            "Carnation": "https://images.unsplash.com/photo-1560385085-1d52c7fc647f",
-            "Hydrangea": "https://images.unsplash.com/photo-1515658672372-6fcd9637eae7"
+        const flowerData = {
+            "Rose": "https://upload.wikimedia.org/wikipedia/commons/1/12/Rose_flower.jpg",
+            "Tulip": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Tulip_%28Tulipa%29.jpg",
+            "Daisy": "https://upload.wikimedia.org/wikipedia/commons/c/cb/Daisy_flower.jpg",
+            "Sunflower": "https://upload.wikimedia.org/wikipedia/commons/2/23/Sunflower_-_Helianthus_annuus.jpg",
+            "Lily": "https://upload.wikimedia.org/wikipedia/commons/3/3b/Lily_flower.jpg",
+            "Daffodil": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Daffodil.jpg",
+            "Orchid": "https://upload.wikimedia.org/wikipedia/commons/4/42/Orchid_flower.jpg"
+            // Add more flowers as needed
         };
 
         function searchFlowers() {
             const input = document.getElementById("searchInput").value.toLowerCase();
-            const resultDiv = document.getElementById("result");
-            resultDiv.innerHTML = '';
+            const resultsDiv = document.getElementById("results");
+            resultsDiv.innerHTML = '';
 
-            if (input) {
-                for (const flower in flowers) {
-                    if (flower.toLowerCase().includes(input)) {
-                        const div = document.createElement("div");
-                        div.className = "flower-item";
-                        div.textContent = flower;
-                        div.onclick = () => showFlowerImage(flower);
-                        resultDiv.appendChild(div);
-                    }
+            for (const flower in flowerData) {
+                if (flower.toLowerCase().includes(input)) {
+                    const div = document.createElement("div");
+                    div.className = "result-item";
+                    div.onclick = () => openFlower(flower);
+                    
+                    const img = document.createElement("img");
+                    img.src = flowerData[flower];
+                    img.alt = flower;
+                    
+                    const name = document.createElement("span");
+                    name.textContent = flower;
+
+                    div.appendChild(img);
+                    div.appendChild(name);
+                    resultsDiv.appendChild(div);
                 }
-                resultDiv.style.display = 'block'; // Show results
-            } else {
-                resultDiv.style.display = 'none'; // Hide results
             }
         }
 
-        function showFlowerImage(flower) {
-            const resultDiv = document.getElementById("result");
-            resultDiv.innerHTML = ''; // Clear previous results
-            const img = document.createElement("img");
-            img.src = flowers[flower];
-            img.alt = flower;
-            img.className = "flower-image";
-            resultDiv.appendChild(img);
-            resultDiv.style.display = 'block'; // Show image
-        }
-
-        function clearSearch() {
-            document.getElementById("searchInput").value = '';
-            document.getElementById("result").innerHTML = '';
-            document.getElementById("result").style.display = 'none'; // Hide results
+        function openFlower(flower) {
+            alert("You selected: " + flower);
+            // Optionally display more information or image in a modal
         }
     </script>
 </body>
