@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Favorite Flower Finder</title>
+    <title>Favorite Flowers</title>
     <style>
         body {
             font-family: 'Verdana', sans-serif;
@@ -11,11 +11,32 @@
             color: #3e2723;
             text-align: center;
             padding: 20px;
+            animation: fadeInPage 1s ease-in-out;
+            transition: background-color 0.5s;
+        }
+
+        @keyframes fadeInPage {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         h1 {
             color: #d81b60;
             margin-bottom: 20px;
+            animation: fadeInText 1s ease-in-out;
+        }
+
+        @keyframes fadeInText {
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        #searchSection {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 1.5s ease-in-out;
         }
 
         #searchInput {
@@ -25,15 +46,47 @@
             border: 2px solid #d81b60;
             font-size: 16px;
             margin-bottom: 15px;
+            transition: border-color 0.3s, transform 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
-        #flowerImage {
-            display: none;
+        #searchInput:focus {
+            border-color: #c2185b;
+            outline: none;
+            transform: scale(1.05);
+        }
+
+        #result {
+            text-align: left;
+            display: inline-block;
+            width: 320px;
+            max-height: 300px;
+            overflow-y: auto;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+            animation: slideIn 0.7s ease;
+            padding: 10px;
+            display: none; /* Initially hidden */
+        }
+
+        .flower-item {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
+            transition: background-color 0.2s;
+        }
+
+        .flower-item:hover {
+            background-color: #f8bbd0;
+        }
+
+        .flower-image {
             width: 100%;
-            max-width: 400px;
             height: auto;
             border-radius: 8px;
-            margin-top: 20px;
         }
 
         button {
@@ -45,46 +98,73 @@
             cursor: pointer;
             font-size: 16px;
             margin-top: 20px;
+            transition: background-color 0.3s, transform 0.3s;
         }
 
         button:hover {
             background-color: #c2185b;
+            transform: scale(1.1);
         }
     </style>
 </head>
 <body>
-    <h1>Find Your Favorite Flower!</h1>
-    <input type="text" id="searchInput" placeholder="Type a flower name...">
-    <button onclick="searchFlower()">Find Flower</button>
-    <img id="flowerImage" alt="Flower Image">
-    
+    <h1>What Is Your Favorite Flower?</h1>
+    <div id="searchSection">
+        <input type="text" id="searchInput" placeholder="Type a flower name..." oninput="searchFlowers()">
+        <div id="result"></div>
+        <button type="button" onclick="clearSearch()">Clear</button>
+    </div>
+
     <script>
-        async function searchFlower() {
-            const flowerName = document.getElementById("searchInput").value;
-            const flowerImage = document.getElementById("flowerImage");
-            
-            if (!flowerName) {
-                alert("Please enter a flower name.");
-                return;
-            }
+        const flowers = {
+            "Rose": "https://images.unsplash.com/photo-1574845522559-12a8e6f58d9d",
+            "Tulip": "https://images.unsplash.com/photo-1582719502941-0aa5d20e634b",
+            "Sunflower": "https://images.unsplash.com/photo-1505150031097-0c3cb1d305c8",
+            "Daisy": "https://images.unsplash.com/photo-1555892625-f18d7ebc36ec",
+            "Lily": "https://images.unsplash.com/photo-1514369912085-cd64795b7494",
+            "Orchid": "https://images.unsplash.com/photo-1503042443070-3c7d0c0b4f15",
+            "Peony": "https://images.unsplash.com/photo-1590715862918-54d7d4cc8b69",
+            "Marigold": "https://images.unsplash.com/photo-1574169208483-5e8bc0be93e7",
+            "Carnation": "https://images.unsplash.com/photo-1560385085-1d52c7fc647f",
+            "Hydrangea": "https://images.unsplash.com/photo-1515658672372-6fcd9637eae7"
+        };
 
-            const apiUrl = `https://api.unsplash.com/search/photos?query=${flowerName}&client_id=YOUR_UNSPLASH_ACCESS_KEY`;
+        function searchFlowers() {
+            const input = document.getElementById("searchInput").value.toLowerCase();
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = '';
 
-            try {
-                const response = await fetch(apiUrl);
-                const data = await response.json();
-
-                if (data.results.length > 0) {
-                    flowerImage.src = data.results[0].urls.regular;
-                    flowerImage.style.display = 'block';
-                } else {
-                    flowerImage.style.display = 'none';
-                    alert("No images found for this flower.");
+            if (input) {
+                for (const flower in flowers) {
+                    if (flower.toLowerCase().includes(input)) {
+                        const div = document.createElement("div");
+                        div.className = "flower-item";
+                        div.textContent = flower;
+                        div.onclick = () => showFlowerImage(flower);
+                        resultDiv.appendChild(div);
+                    }
                 }
-            } catch (error) {
-                console.error("Error fetching the flower image:", error);
-                alert("An error occurred while fetching the image.");
+                resultDiv.style.display = 'block'; // Show results
+            } else {
+                resultDiv.style.display = 'none'; // Hide results
             }
+        }
+
+        function showFlowerImage(flower) {
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = ''; // Clear previous results
+            const img = document.createElement("img");
+            img.src = flowers[flower];
+            img.alt = flower;
+            img.className = "flower-image";
+            resultDiv.appendChild(img);
+            resultDiv.style.display = 'block'; // Show image
+        }
+
+        function clearSearch() {
+            document.getElementById("searchInput").value = '';
+            document.getElementById("result").innerHTML = '';
+            document.getElementById("result").style.display = 'none'; // Hide results
         }
     </script>
 </body>
